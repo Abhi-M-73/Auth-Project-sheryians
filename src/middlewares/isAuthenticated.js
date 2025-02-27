@@ -12,6 +12,7 @@ const isAuthenticated = (req, res, next) => {
 
         // Verify token
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.user = decoded;
         req.userId = decoded.id;
 
         next(); // Proceed to the next middleware

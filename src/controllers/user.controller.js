@@ -1,6 +1,7 @@
 const userModel = require("../models/user.model");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const postModel = require("../models/post.model");
 
 module.exports.registerView = async (req, res) => {
     try {
@@ -29,7 +30,9 @@ module.exports.homeView = async (req, res) => {
         const userId = req.userId;
         const user = await userModel.findById(userId);
 
-        res.render('home', { user });
+        const allPosts = await postModel.find().populate("author");
+
+        res.render('home', { user, allPosts });
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({
@@ -40,8 +43,8 @@ module.exports.homeView = async (req, res) => {
 
 module.exports.userRegister = async (req, res) => {
     try {
-        const { username, email, profileImage, age, password } = req.body;
-        if (!username || !email || !profileImage || !age || !password) {
+        const { username, email, profileImage, password } = req.body;
+        if (!username || !email || !profileImage || !password) {
             return res.status(400).json({
                 message: "All fields are required",
             });
@@ -60,7 +63,6 @@ module.exports.userRegister = async (req, res) => {
             username,
             email,
             profileImage,
-            age,
             password: hashPassword,
         });
 

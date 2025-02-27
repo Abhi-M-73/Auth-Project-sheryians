@@ -12,7 +12,7 @@ app.set("view engine", "ejs");
 
 
 app.use("/users", userRoute);
-app.use("/post", postRoute);
+app.use("/posts", postRoute);
 
 
 module.exports = app;

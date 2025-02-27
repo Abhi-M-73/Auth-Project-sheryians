@@ -1,4 +1,5 @@
 const postModel = require('../models/post.model');
+const userModel = require('../models/user.model');
 
 module.exports.createPost = async (req, res) => {
     try {
@@ -6,26 +7,19 @@ module.exports.createPost = async (req, res) => {
         const userId = req.userId;
 
         if (!title || !content) {
-            return res.status(400).json({
-                message: "All fields are required",
-            });
+            return res.status(400).json({ message: "Title and content are required" });
         }
 
-        const post = await postModel.create({
-            title,
-            content,
-            userId,
-        });
+        const post = await postModel.create({ title, content, author: userId });
 
-        return res.status(201).json({
-            message: "Post created",
-            post,
-        })
+        const user = await userModel.findById(userId)
+        user.posts.push(post);
+        await user.save();
+
+        return res.redirect("/users/home")
 
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({
-            message: "Error is create post",
-        });
+        console.error("Error in createPost:", error.message);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
